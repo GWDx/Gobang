@@ -1,18 +1,15 @@
 <script>
-    let board = Array(36).fill('')
-    let color = 'black'
-    const inverseColor = { white: 'black', black: 'white' }
+    import { n, board, win, color, getBoard, addChessman } from './App.js'
 
     export default {
         data() {
-            return { board: board, color: color }
+            return { board: board, color: color, n: n }
         },
         methods: {
             clickChessman(i) {
                 console.log('click ' + i)
-                if (board[i] !== '') return
-                board[i] = color
-                color = inverseColor[color]
+                if (board[i] !== '' || win) return
+                addChessman(i)
 
                 console.log(board)
                 this.board = board.slice()
@@ -25,11 +22,11 @@
 <template>
     <div class="box">
         <div class="squareGrid">
-            <div class="square" v-for="(x, j) in Array(25)" :key="j"></div>
+            <div class="square" v-for="(x, j) in Array((n - 1) ** 2)" :key="j"></div>
         </div>
 
         <div class="chessmanGrid">
-            <div class="chessmanSquare" v-for="(x, i) in Array(36)" :key="i">
+            <div class="chessmanSquare" v-for="(x, i) in Array(n ** 2)" :key="i">
                 <div class="chessmanClickArea" @click="clickChessman(i)">
                     <div class="chessman" v-if="board[i]" :style="{ background: board[i] }"></div>
                 </div>
