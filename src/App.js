@@ -3,12 +3,21 @@ let board = Array(n * n).fill('')
 let win = false
 let color = 'black'
 
+let len
+const inverseColor = {
+    white: 'black',
+    black: 'white'
+}
+
+function init() {
+    board = Array(n * n).fill('')
+    win = false
+    color = 'black'
+}
 
 function getBoard(x, y) {
     return board[x * n + y]
 }
-
-let len
 
 function updateLen(item) {
     for (let i of item)
@@ -26,12 +35,9 @@ function updateLen(item) {
     return false
 }
 
-const inverseColor = {
-    white: 'black',
-    black: 'white'
-}
-
 function addChessman(index) {
+    if (board[index] !== '' || win)
+        return
     board[index] = color
     let x = Math.floor(index / n)
     let y = index % n
@@ -61,15 +67,12 @@ function addChessman(index) {
         len = 0
         for (let item of group) {
             win = updateLen(item)
-            if (win) {
-                console.log(color + ' win')
+            if (win)
                 return color
-            }
         }
     }
     color = inverseColor[color]
+    return ''
 }
 
-board = Array(n * n).fill('')
-
-export { n, board, win, color, getBoard, addChessman }
+export { n, board, win, color, getBoard, addChessman, init }

@@ -1,5 +1,5 @@
 <script>
-    import { n, board, win, color, getBoard, addChessman } from './App.js'
+    import { n, board, win, color, getBoard, addChessman, init } from './App.js'
 
     export default {
         data() {
@@ -8,8 +8,8 @@
         methods: {
             clickChessman(i) {
                 console.log('click ' + i)
-                if (board[i] !== '' || win) return
-                addChessman(i)
+                const winner = addChessman(i)
+                if (winner) console.log(winner + ' win')
 
                 console.log(board)
                 this.board = board.slice()
