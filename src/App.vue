@@ -1,19 +1,30 @@
 <script>
-    import { n, board, win, color, getBoard, addChessman, init } from './App.js'
+    import { n, board, win, colorIndex, getBoard, addChessman, init } from './App.js'
+    import { play } from './machine'
+
+    const indexToColor = ['', 'black', 'white']
+
+    let machinePlayPosition = play(board)
+    addChessman(machinePlayPosition)
 
     export default {
         data() {
-            return { board: board, color: color, n: n }
+            return { board: board, colorIndex: colorIndex, indexToColor: indexToColor, n: n }
         },
         methods: {
-            clickChessman(i) {
-                console.log('click ' + i)
-                const winner = addChessman(i)
-                if (winner) console.log(winner + ' win')
+            clickChessman(index) {
+                if (board[index] !== 0 || win) return
 
-                console.log(board)
+                console.log('click ' + index)
+                let winner = addChessman(index)
+                if (winner) console.log(indexToColor[winner] + ' win')
+                else {
+                    machinePlayPosition = play(board)
+                    winner = addChessman(machinePlayPosition)
+                    if (winner) console.log(indexToColor[winner] + ' win')
+                }
                 this.board = board.slice()
-                this.color = color
+                this.colorIndex = colorIndex
             }
         }
     }
@@ -28,7 +39,7 @@
         <div class="chessmanGrid">
             <div class="chessmanSquare" v-for="(x, i) in Array(n ** 2)" :key="i">
                 <div class="chessmanClickArea" @click="clickChessman(i)">
-                    <div class="chessman" v-if="board[i]" :style="{ background: board[i] }"></div>
+                    <div class="chessman" v-if="board[i]" :style="{ background: indexToColor[board[i]] }"></div>
                 </div>
             </div>
         </div>
@@ -45,10 +56,10 @@
         left: 50px;
         top: 50px;
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        grid-template-rows: repeat(5, 1fr);
-        width: 500px;
-        height: 500px;
+        grid-template-columns: repeat(9, 1fr);
+        grid-template-rows: repeat(9, 1fr);
+        width: 900px;
+        height: 900px;
         border: solid 1px lightgray;
     }
     .square {
@@ -63,10 +74,10 @@
         left: 0px;
         top: 0px;
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        grid-template-rows: repeat(6, 1fr);
-        width: 600px;
-        height: 600px;
+        grid-template-columns: repeat(10, 1fr);
+        grid-template-rows: repeat(10, 1fr);
+        width: 1000px;
+        height: 1000px;
         border: solid 1px gray;
     }
     .chessmanSquare {
