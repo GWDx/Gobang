@@ -1,6 +1,6 @@
-const n = 10
+const n = 15
 let board = Array(n * n).fill(0)
-let win = false
+let win = 0
 let colorIndex = 1
 
 let len
@@ -8,7 +8,7 @@ const inverseColorIndex = { 0: 0, 1: 2, 2: 1 }
 
 function init() {
     board = Array(n * n).fill(0)
-    win = false
+    win = 0
     colorIndex = 1
 }
 
@@ -36,12 +36,18 @@ function updateLen(item) {
     return false
 }
 
-function addChessman(index) {
-    if (board[index] !== 0 || win)
-        return
-    board[index] = colorIndex
+function indexToPosition(index) {
     let x = Math.floor(index / n)
     let y = index % n
+    return [x, y]
+}
+
+function addChessman(index) {
+    if (board[index] !== 0 || win != 0)
+        return
+    board[index] = colorIndex
+    let x, y;
+    [x, y] = indexToPosition(index)
 
     let allUpdate = [[], [], [], []]
     for (let i = -4; i < 4; i++) {
@@ -66,14 +72,14 @@ function addChessman(index) {
     for (let group of allUpdate) {
         // console.log(group)
         len = 0
-        for (let item of group) {
-            win = updateLen(item)
-            if (win)
+        for (let item of group)
+            if (updateLen(item)) {
+                win = colorIndex
                 return colorIndex
-        }
+            }
     }
     colorIndex = inverseColorIndex[colorIndex]
     return 0
 }
 
-export { n, board, win, colorIndex, getBoard, getBoardIndex, addChessman, init }
+export { n, board, win, colorIndex, getBoard, getBoardIndex, addChessman, indexToPosition, init }

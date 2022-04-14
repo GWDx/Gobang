@@ -9,7 +9,7 @@
 
     export default {
         data() {
-            return { board: board, colorIndex: colorIndex, indexToColor: indexToColor, n: n }
+            return { board: board, colorIndex: colorIndex, indexToColor: indexToColor, n: n, win: win }
         },
         methods: {
             clickChessman(index) {
@@ -25,6 +25,7 @@
                 }
                 this.board = board.slice()
                 this.colorIndex = colorIndex
+                this.win = win
             }
         }
     }
@@ -43,23 +44,26 @@
                 </div>
             </div>
         </div>
+
+        <div class="winInfo" v-if="win">{{ indexToColor[win] }} win</div>
     </div>
 </template>
 
 <style scoped>
     .box {
+        position: relative;
+        left: 75px;
+        top: 75px;
         width: fit-content;
         height: fit-content;
     }
     .squareGrid {
-        position: absolute;
-        left: 50px;
-        top: 50px;
+        position: relative;
         display: grid;
-        grid-template-columns: repeat(9, 1fr);
-        grid-template-rows: repeat(9, 1fr);
-        width: 900px;
-        height: 900px;
+        grid-template-columns: repeat(14, 1fr);
+        grid-template-rows: repeat(14, 1fr);
+        width: 1400px;
+        height: 1400px;
         border: solid 1px lightgray;
     }
     .square {
@@ -70,14 +74,14 @@
         border: solid 1px lightgray;
     }
     .chessmanGrid {
-        position: absolute;
-        left: 0px;
-        top: 0px;
+        position: relative;
+        left: -50px;
+        top: -1450px;
         display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        grid-template-rows: repeat(10, 1fr);
-        width: 1000px;
-        height: 1000px;
+        grid-template-columns: repeat(15, 1fr);
+        grid-template-rows: repeat(15, 1fr);
+        width: 1500px;
+        height: 1500px;
         border: solid 1px gray;
     }
     .chessmanSquare {
@@ -86,8 +90,8 @@
         justify-content: center;
     }
     .chessmanClickArea {
-        width: 40%;
-        height: 40%;
+        width: 60%;
+        height: 60%;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -100,5 +104,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+    .winInfo {
+        position: relative;
+        top: -1400px;
+        font-size: 50px;
+        text-align: center;
     }
 </style>

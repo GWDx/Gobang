@@ -17,14 +17,15 @@ let inverseColorIndex = { 0: 0, 1: 2, 2: 1 }
 
 function check(list) {
     let len = 0
-    for (let i of list) {
-        if (list[i] == 1) {
+    for (let x of list) {
+        if (x == 1) {
             len++
             if (len == 5)
                 return 1
         } else
             len = 0
     }
+    return 0
 }
 
 let searchCache = {}
@@ -35,12 +36,25 @@ function search(list) {
         return searchCache[list]
     if (list.length < 5)
         return 0
-    let index = list.indexOf(0)
+
+    if (check(list)) {
+        let all0Length = list.filter(x => x == 0).length
+        let ans = 2 ** all0Length
+        return ans
+    }
+    if (list.indexOf(2) >= 0) {
+        let split = arraySplit(list, 2)
+        let allResult = split.map(array => search(array))
+        let sum = allResult.reduce((x, y) => x + y)
+        return sum
+    }
+    const index = list.indexOf(0)
     if (index < 0)
         return check(list)
     let list1 = list.slice()
     list1[index] = 1
-    let list2 = list.slice(index + 1)
+    let list2 = list.slice()
+    list2[index] = 2
 
     let answer1
     let prev = 0
@@ -61,22 +75,26 @@ function search(list) {
 }
 
 function lineOneSideEvauate(list) {
-    let split1 = arraySplit(list, 2)
-    let filter1 = split1.filter(array => array.length >= 5)
-    if (filter1.length === 0)
-        return 0
-    // console.log(filter1)
-    let rateList = filter1.map(array => search(array) / 2 ** array.filter(x => x == 0).length)
-    // console.log(rateList)
-    let max = Math.max(rateList)
-    return max
+    let all0Length = list.filter(x => x == 0).length
+    let current = search(list) / 2 ** all0Length
+    let assumeResult = Array(list.length).fill(0)
+    for (let i = 0; i < list.length; i++)
+        if (list[i] === 0) {
+            let tempList = list.slice()
+            tempList[i] = 1
+            assumeResult[i] = search(tempList) / 2 ** (all0Length - 1)
+        }
+    // let ans = { 'current': current, 'assumeResult': assumeResult }
+    let ans = assumeResult.map(x => (1.1 - current) / (1.1 - x))
+    return ans
 }
 
 function lineEvauate(list) {
     let result1 = lineOneSideEvauate(list)
     let list2 = list.map(x => inverseColorIndex[x])
     let result2 = lineOneSideEvauate(list2)
-    return [result1, result2]
+    let ans = result1.map((x, i) => x + result2[i])
+    return ans
 }
 
 function play(board) {
@@ -94,49 +112,38 @@ function play(board) {
             for (let k = 0; k < 4; k++)
                 allGroup[k][toGroupIndex[k](i, j)].push(getBoardIndex(i, j))
 
-    function getValue(group) {
-        let boardValue = group.map(list => list.map(x => board[x]))
-        let value = boardValue.map(list => lineEvauate(list))
-        return value
+    let indexScore = Array(n * n).fill(0).map(x => [])
+
+    for (let group of allGroup) {
+        for (let indexList of group) {
+            let listBoardValue = indexList.map(x => board[x])
+            let value = lineEvauate(listBoardValue)
+            for (let i = 0; i < indexList.length; i++)
+                indexScore[indexList[i]].push(value[i])
+        }
     }
 
-    let allGroupValue = allGroup.map(group => getValue(group))
-
-    let allSum = Array(n * n)
-    for (let i = 0; i < n; i++)
-        for (let j = 0; j < n; j++) {
-            let allValue = []
-            for (let k = 0; k < 4; k++) {
-                let value = allGroupValue[k][toGroupIndex[k](i, j)]
-                allValue.push(value)
-            }
-            let sum = allValue.map(x => Math.exp(5 * x[0]) + Math.exp(5 * x[1])).reduce((x, y) => x + y)
-            allSum[getBoardIndex(i, j)] = sum
-        }
-    let maxSum = 0
-    let maxIndex = 0
-    for (let i in allSum)
-        if (board[i] == 0 && maxSum < allSum[i]) {
-            maxSum = allSum[i]
-            maxIndex = i
-        }
-    console.log(maxIndex)
-
-    return maxIndex
+    let allSum = indexScore.map(x => x.reduce((x, y) => x + y))
+    let maxSum = Math.max.apply(0, allSum)
+    let maxIndex = []
+    for (let i = 0; i < allSum.length; i++)
+        if (maxSum == allSum[i])
+            maxIndex.push(i)
+    let ans = maxIndex[Math.floor(Math.random() * maxIndex.length)]
+    return ans
 }
 
-// let line = Array(10).fill(0)
+// let line = Array(15).fill(0)
 // line[3] = 1
-// line[4] = 2
+// line[4] = 1
+// line[5] = 1
+// line[6] = 1
+// let ans = lineOneSideEvauate(line)
+// console.log(ans)
+
+// console.log(search([1, 1, 1, 1, 0]))
+
 // console.log(lineEvauate(line))
-
-// console.log(search(line))
 // console.log(count)
-
-// let board = Array(n * n).fill(0)
-// board[44] = 1
-// board[45] = 2
-
-// play()
 
 export { play }
